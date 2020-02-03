@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Linking, TouchableHighlight, PermissionsAndroid, Platform, StyleSheet} from 'react-native';
+import { Text, View, Linking, TouchableOpacity, PermissionsAndroid, Platform, StyleSheet,Image} from 'react-native';
 import { CameraKitCameraScreen, } from 'react-native-camera-kit';
 import {db} from './firebase'
 console.disableYellowBox=true
@@ -12,12 +12,11 @@ export default class App extends Component {
       opneScanner: false,
     };
   }
-  onOpenlink() {
-    Linking.openURL(this.state.qrvalue);
-  }
+  
   onBarcodeScan(qrvalue) {
     this.setState({ qrvalue: qrvalue });
     this.setState({ opneScanner: false });
+    // langsung di push ke firebase hasil dari scan
     db.ref('/po').push(qrvalue)
   }
   onOpneScanner() {
@@ -52,16 +51,20 @@ export default class App extends Component {
     
     if (!this.state.opneScanner) {
       return (
-        <View style={styles.container}>
-            <Text style={styles.heading}>React Native QR Code Example</Text>
-            <Text style={styles.simpleText}>{this.state.qrvalue}</Text>
-            <TouchableHighlight
-              onPress={() => this.onOpneScanner()}
-              style={styles.button}>
-                <Text style={{ color: '#FFFFFF', fontSize: 12 }}>
-                Open QR Scanner
-                </Text>
-            </TouchableHighlight>
+        <View style={{flex:1}}>
+          <View style={{padding:20,backgroundColor:'#2989A9',justifyContent:'center',alignItems:'center'}}>
+            <Text style={{fontSize:20,color:'#fff',fontWeight:'bold'}}>QR Code</Text>
+          </View>
+          <View style={{paddingVertical:10,backgroundColor:'#fff',elevation:15,borderRadius:10,margin:15}}>
+            <Text style={{fontSize:15,marginLeft:10}}>Results :</Text>
+            <Text style={{fontSize:13,marginLeft:15}}>{this.state.qrvalue}</Text>
+            <TouchableOpacity onPress={() => this.onOpneScanner()}>
+              <View style={{flexDirection:'row',paddingVertical:10,width:'50%',backgroundColor:'#2989A9',borderRadius:10,alignSelf:'center'}}>
+                <Image style={{height:25,width:25,backgroundColor:'#fff',marginLeft:15}} source={require('./qr.png')}/>
+                <Text style={{fontSize:15,marginLeft:16,color:'#fff'}}>Scan Qr Code</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       );
     }
@@ -81,32 +84,3 @@ export default class App extends Component {
     );
   }
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor:'white'
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#2c3539',
-    padding: 10,
-    width:300,
-    marginTop:16
-  },
-  heading: { 
-    color: 'black', 
-    fontSize: 24, 
-    alignSelf: 'center', 
-    padding: 10, 
-    marginTop: 30 
-  },
-  simpleText: { 
-    color: 'black', 
-    fontSize: 20, 
-    alignSelf: 'center', 
-    padding: 10, 
-    marginTop: 16
-  }
-});
